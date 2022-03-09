@@ -1,6 +1,7 @@
 ﻿
 @{
     ViewData["Title"] = "New Movie";
+    //ViewBag.categories;
     // Form for entering new movie information
 }
 @model Mission04HW.Models.ApplicationResponse
@@ -11,8 +12,14 @@
 
 <div>
     <form method="post">
-        <label asp-for="Category">Category:</label>
-        <input asp-for="Category" /><br /><br />
+        <label asp-for="CategoryId">Category:</label>
+        <select asp-for="CategoryId" >
+            <option value="">Select Category</option>
+            @foreach (Category c in ViewBag.categories)
+            {
+                <option value="@c.CategoryId">@c.CategoryName</option>
+            }
+        </select><br /><br />
 
         <label asp-for="Title">Title:</label>
         <input asp-for="Title" /><br /><br />
@@ -46,6 +53,7 @@
         <button type="submit">Submit</button>
 
         <div asp-validation-summary="All"></div>
+        <!--I'm not sure what asp validation summary is'-->
 
     </form>
 </div>

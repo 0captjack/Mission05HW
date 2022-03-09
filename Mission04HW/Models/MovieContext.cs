@@ -13,6 +13,7 @@ namespace Mission04HW.Models
             //lEbLaNc
         }    
         public DbSet<ApplicationResponse> responses { get; set; }
+        public DbSet<Category> categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder mb)
         {
@@ -21,7 +22,7 @@ namespace Mission04HW.Models
                 new ApplicationResponse
                 {
                     ApplicationId = 1,
-                    Category = "Sci-Fi",
+                    CategoryId = 5,
                     Title = "Sunshine",
                     Year = "2007",
                     Director = "Danny Boyle",
@@ -33,7 +34,7 @@ namespace Mission04HW.Models
                 new ApplicationResponse
                 {
                     ApplicationId = 2,
-                    Category = "Drama",
+                    CategoryId = 3,
                     Title = "Prisoners",
                     Year = "2013",
                     Director = "Denis Villeneuve",
@@ -45,7 +46,7 @@ namespace Mission04HW.Models
                 new ApplicationResponse
                 {
                     ApplicationId = 3,
-                    Category = "Thriller",
+                    CategoryId = 4,
                     Title = "Jaws",
                     Year = "1975",
                     Director = "Steven Spielberg",
@@ -54,6 +55,15 @@ namespace Mission04HW.Models
                     Lent_To = "",
                     Notes = "Paved the way for so many great films"
                 }
+            );
+            mb.Entity<Category>().HasData(
+                new Category { CategoryId = 1, CategoryName = "Comedy" },
+                new Category { CategoryId = 2, CategoryName = "Crime" },
+                new Category { CategoryId = 3, CategoryName = "Drama" },
+                new Category { CategoryId = 4, CategoryName = "Thriller" },
+                new Category { CategoryId = 5, CategoryName = "Sci-Fi" },
+                new Category { CategoryId = 6, CategoryName = "Undefined" }
+                //this seeds the database with categories and their IDs I think
             );
         }
     }

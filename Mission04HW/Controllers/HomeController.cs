@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mission04HW.Models;
 using System;
@@ -11,13 +12,11 @@ namespace Mission04HW.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private MovieContext _instanceContext { get; set; }
+        private MovieContext movieContext { get; set; }
 
-        public HomeController(ILogger<HomeController> logger, MovieContext someName)
+        public HomeController(MovieContext someName)
         {
-            _logger = logger;
-            _instanceContext = someName;
+            movieContext = someName;
         }
 
         public IActionResult Index()
@@ -27,15 +26,24 @@ namespace Mission04HW.Controllers
         [HttpGet]
         public IActionResult MovieForm()
         {
+            ViewBag.categories = movieContext.categories.ToList();
             return View();
         }
 
         [HttpPost]
         public IActionResult MovieForm(ApplicationResponse ar)
         {
-            _instanceContext.Add(ar);
-            _instanceContext.SaveChanges();
-            return View("Index", ar);
+            if (ModelState.IsValid) //if the input meets requirements
+            {
+                movieContext.Add(ar); //add it to variable ar
+                movieContext.SaveChanges();
+                return View("Movielist", ar);
+            }
+            else
+            {
+                ViewBag.categories = movieContext.categories.ToList();
+                return View(ar); //tell em to fix their input and send em back
+            }
         }
 
         public IActionResult Bacon()
@@ -44,9 +52,43 @@ namespace Mission04HW.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Movielist ()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var applications = movieContext.responses
+                .Include(x => x.Category)
+                .OrderBy(x => x.Category)
+                .ToList();
+
+            return View(applications);
+        }
+        [HttpGet]
+        public IActionResult Edit(int applicationid)
+        {//we reused some code from adding a new record but I don't really understand it
+            ViewBag.categories = movieContext.categories.ToList();
+            var application = movieContext.responses.Single(x => x.ApplicationId == applicationid);
+            return View("MovieForm", application);
+        }
+        [HttpPost]
+        public IActionResult Edit(ApplicationResponse blah)
+        {
+            movieContext.Update(blah);
+            movieContext.SaveChanges();
+            return RedirectToAction("Movielist");
+        }
+        [HttpGet]
+        public IActionResult Delete(int applicationid)
+        {
+            var application = movieContext.responses.Single(x => x.ApplicationId == applicationid);
+            return View(application);
+            // i'm not sure what this does
+            //i know the .Single selects one record for deletion
+        }
+        [HttpPost]
+        public IActionResult Delete(ApplicationResponse ar)
+        {
+            movieContext.responses.Remove(ar);
+            movieContext.SaveChanges();
+            return RedirectToAction("Movielist");
         }
     }
 }
